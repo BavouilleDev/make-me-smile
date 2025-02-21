@@ -15,7 +15,7 @@
             }
 
             else {
-                fetch(`http://195.35.2.184:8000/get_meme?id=${userId}`)
+                fetch(`https://make-me-smile.great-site.net/api/get_meme?id=${userId}`)
                     .then(response => response.json())
                     .then(data => {
                         if (data) {                
@@ -50,7 +50,7 @@
             const liker_id = getCookie("id") || 0;
 
             if (liker_id != 0) {
-                fetch(`http://195.35.2.184:8000/user_view?userid=${liker_id}&memeid=${userId}`)
+                fetch(`https://make-me-smile.great-site.net/api/user_view?userid=${liker_id}&memeid=${userId}`)
             }
 
             let liked = false;
@@ -61,12 +61,12 @@
 
                 liked = !liked;
                 if (liked) {
-                    fetch(`http://195.35.2.184:8000/like?id=${userId}&liker_id=${liker_id}`)
+                    fetch(`https://make-me-smile.great-site.net/api/like?id=${userId}&liker_id=${liker_id}`)
                     likeElement.textContent = `${currentLikes + 1}`;
                     icon.src = 'img/liked.png';
                 }
                 else {
-                    fetch(`http://195.35.2.184:8000/unlike?id=${userId}`)
+                    fetch(`https://make-me-smile.great-site.net/api/unlike?id=${userId}`)
                     likeElement.textContent = `${currentLikes - 1}`;
                     icon.src = 'img/like.png';
                 }
@@ -78,7 +78,7 @@
                     }
                     else {
                         if (event.key === 'ArrowDown') {
-                            fetch('http://195.35.2.184:8000/get_next?userid=' + liker_id)
+                            fetch('https://make-me-smile.great-site.net/api/get_next?userid=' + liker_id)
                                 .then(response => response.json())
                                 .then(data => {
                                     console.log(data);
