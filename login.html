@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Make me smile - login</title>
+        <link rel="stylesheet" href="output.css">
+    </head>
+
+    <body class="lg:w-11/12 sm:w-screen mx-auto h-screen flex items-center justify-center">
+        <div class="wrapper">
+            <div class="card-switch">
+                <label class="switch">
+                <input class="toggle" type="checkbox">
+                <span class="slider"></span>
+                <span class="card-side"></span>
+                <div class="flip-card__inner">
+                    <div class="flip-card__front">
+                        <div class="title">Se connecter</div>
+                        <form method="POST" class="flip-card__form" id="login">
+                            <input type="text" placeholder="Pseudo" name="pseudo" class="flip-card__input">
+                            <input type="password" placeholder="Mot de passe" name="password" class="flip-card__input">
+                            <button class="flip-card__btn">Let`s go!</button>
+                        </form>
+                    </div>
+                    <div class="flip-card__back">
+                        <div class="title">Créer un compte</div>
+                        <form method="POST" class="flip-card__form" id="register">
+                            <input type="text" placeholder="Pseudo" name="pseudo" class="flip-card__input" required>
+                            <input type="email" placeholder="Email" name="email" class="flip-card__input" required>
+                            <input type="password" placeholder="Password" name="password" class="flip-card__input" required>
+                            <button class="flip-card__btn">Confirmer!</button>
+                        </form>
+                    </div>
+                </div>
+                </label>
+            </div>
+        </div>
+
+        <script>
+            document.getElementById("login").addEventListener("submit", async function(event) {
+                event.preventDefault();
+
+                let formData = new FormData(this);
+
+                let response = await fetch("http://195.35.2.184:8000/login", {
+                    method: "POST",
+                    body: formData
+                });
+
+                let result = await response.json();
+                if (Number.isInteger(result[0])) {
+                    window.location.href = 'index.html';
+                }
+                console.log("Réponse du serveur :", result);
+                let pseudo = formData.get("pseudo");
+                let password = formData.get("password");
+                document.cookie = "pseudo=" + pseudo + ";"
+                document.cookie = "password=" + password + ";"
+                document.cookie = "id=" + result[0] + ";"
+            });
+
+            document.getElementById("register").addEventListener("submit", async function(event) {
+                event.preventDefault();
+
+                let formData = new FormData(this);
+
+                let response = await fetch("http://195.35.2.184:8000/register", {
+                    method: "POST",
+                    body: formData
+                });
+
+                let result = await response.json();
+                if (Number.isInteger(result[0])) {
+                    window.location.href = 'profile.html?id=' + result[0];
+                }
+                
+                console.log("Réponse du serveur :", result);
+                let pseudo = formData.get("pseudo");
+                let password = formData.get("password");
+                document.cookie = "pseudo=" + pseudo + ";"
+                document.cookie = "password=" + password + ";"
+                document.cookie = "id=" + result[0] + ";"
+            });
+
+
+
+
+
+        </script>
+    </body>
+
+</html>

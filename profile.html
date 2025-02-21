@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Make me smile</title>
+        <link rel="stylesheet" href="output.css">
+    </head>
+
+    <body class="w-screen h-screen mx-auto text-center flex flex-row">
+        <script>
+            const urlParams = new URLSearchParams(window.location.search);
+            userId = urlParams.get('id');
+
+            function getCookie(name) {
+                const value = `; ${document.cookie}`;
+                const parts = value.split(`; ${name}=`);
+                if (parts.length === 2) return parts.pop().split(';').shift();
+                return null;
+            }
+
+            const id = getCookie("id") || 0;
+
+            if (userId === null) {
+                if (id == 0) {
+                    window.location.href = 'login.html'; 
+                }
+                else {
+                    window.location.href = "profile.html?id=" + id
+                }
+            }
+
+            else {
+                fetch(`http://195.35.2.184:8000/get_user_data?id=${userId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data) {               
+                            const currentTimestamp = Date.now();
+                            const days = Math.floor((currentTimestamp - data.timestamp) / (1000 * 60 * 60 * 24));
+                            
+                            document.getElementById('username').textContent = `${data.username}`;
+                            document.getElementById('date').textContent = `${data.date} (il y a ${days} jours)`;
+                            document.getElementById('memes').textContent = `${data.memes.length}`;
+                            document.getElementById('likes').textContent = `${data.likes}`;
+
+                            if (data.banner) {
+                                document.getElementById('banner').style.backgroundImage = `url(${data.banner})`;
+                            }
+
+                            const container = document.getElementById("meme-container");
+                            const memes = data.memes;
+                            memes.forEach((meme, index) => {
+                                const memeDiv = document.createElement("div");
+                                memeDiv.className = "flex flex-col rounded-xl overflow-hidden bg-slate-700";
+                                memeDiv.innerHTML = `
+                                    <a href="index.html?id=${meme}"><img src="http://195.35.2.184/uploaded/${meme}.webp" class="profile-meme"></a>
+                                `;
+
+                                container.appendChild(memeDiv);
+                            });
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Erreur lors de la récupération des données:', error);
+                    });
+                
+            }
+
+
+
+        </script>
+        <div id="header" class="flex flex-col w-1/6 my-auto gap-10">
+            <a href="index.html" class="text-5xl text-gray-300 lg:text-base hover:text-white flex flex-row items-center justify-center"><img src="img/logo.png" class="icon">Memes</a>
+            <a href="upload.html" class="text-5xl text-gray-300 lg:text-base hover:text-white flex flex-row items-center justify-center"><img src="img/upload.png" class="icon">Uploader</a>
+            <a href="profile.html" id="link-profile" class="text-5xl text-gray-300 lg:text-base hover:text-white flex flex-row items-center justify-center"><img src="img/profile.png" class="icon">Mon profil</a>
+        </div>
+
+        <div class="w-5/6 mx-auto h-screen bg-[#1b263b] rounded-l-3xl">
+            <div id="header" style="background-size: cover; background-position: center;" class="h-1/3 flex flex-col justify-center items-center">
+                <p id="username" class="text-3xl text-white font-semibold my-12 bg-[#0D1B2A] bg-opacity-40 px-6 py-4 rounded-xl"></p>
+                <div class=" flex flex-row flex-wrap bg-[#0D1B2A] bg-opacity-60 px-6 py-4 rounded-xl">
+                    <div class="flex flex-row gap-2 ml-6">
+                        <p class="text-slate-200">Date d'inscription : </p>
+                        <p id="date" class="text-white font-bold"></p>
+                    </div>
+                    <div class="flex flex-row gap-2 ml-6">
+                        <p class="text-slate-200">Memes postés : </p>
+                        <p id="memes" class="text-white font-bold"></p>
+                    </div>
+                    <div class="flex flex-row gap-2 ml-6">
+                        <p class="text-slate-200">Likes cumulés : </p>
+                        <p id="likes" class="text-white font-bold"></p>
+                    </div>
+                </div>
+            </div>
+
+
+            <div id="meme-container" class="flex flex-wrap justify-center gap-4 mt-5">
+
+            </div>            
+        </div>
+    </body>
+
+</html>

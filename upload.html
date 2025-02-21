@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Make me smile</title>
+        <link rel="stylesheet" href="output.css">
+    </head>
+
+    <body class="lg:w-11/12 sm:w-screen mx-auto h-screen flex items-center justify-center">
+        <div class="uploading w-7/12 h-96 shadow-xl rounded-lg p-8 flex flex-col items-center justify-center text-center">
+            <p class="text-3xl text-white font-semibold mb-4">Upload ton meme</p>
+            <p class="text-slate-600 mb-6">Tu peux uploader un fichier .jpg, .jpeg ou .png</p>
+
+            <form id="form" enctype="multipart/form-data" multiple accept=".png,.jpg,.jpeg">
+                <div class="flex flex-col items-center gap-2">
+                    <label for="file" class="cursor-pointer px-6 py-3 bg-[#2d8cf0] text-white rounded shadow-lg hover:bg-blue-600 active:scale-95 transition">
+                        Sélectionner un fichier
+                    </label>
+                    <input type="file" name="file" id="file" class="hidden">
+                    <span id="file-name" class="text-sm text-gray-500">Aucun fichier sélectionné</span>
+                </div>
+                <input type="text" hidden required name="pseudo" value="" id="pseudo">
+                <input type="text" hidden required name="password" value="" id="password">
+                <button id="submit" type="submit" class="bg-[#2d8cf0] text-white py-3 px-6 rounded shadow-lg cursor-pointer hover:bg-blue-600 transition-colors mt-4">Envoyer</button>
+            </form>            
+        </div>
+
+        <script>
+            document.getElementById('file').addEventListener('change', function(event) {
+                const fileName = event.target.files.length ? event.target.files[0].name : "Aucun fichier sélectionné";
+                document.getElementById('file-name').textContent = fileName;
+            });
+        
+            function getCookie(name) {
+                const value = `; ${document.cookie}`;
+                const parts = value.split(`; ${name}=`);
+                return parts.length === 2 ? parts.pop().split(';').shift() : null;
+            }
+        
+            const pseudo = getCookie("pseudo");
+            const password = getCookie("password");
+        
+            if (!pseudo || !password) {
+                window.location.href = 'login.html';
+            }
+        
+            const formData = new URLSearchParams();
+            formData.append("pseudo", pseudo);
+            formData.append("password", password);
+        
+            fetch("http://195.35.2.184:8000/allow", {
+                method: "POST",
+                headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.message !== "success") {
+                    window.location.href = 'login.html';
+                }
+            })
+            .catch(error => {
+                console.error('Erreur lors de la récupération des données:', error);
+            });
+        
+            // Remplissage des inputs cachés
+            document.getElementById('pseudo').value = pseudo;
+            document.getElementById('password').value = password;
+        
+            // Gestion du formulaire
+            document.getElementById('form').addEventListener('submit', function(event) {
+                event.preventDefault(); // Empêcher la soumission automatique
+        
+                const fileInput = document.getElementById("file");
+                if (!fileInput.files[0]) {
+                    alert("Veuillez sélectionner un fichier.");
+                    return;
+                }
+        
+                const formData = new FormData();
+                formData.append("file", fileInput.files[0]);
+                formData.append("pseudo", pseudo);
+                formData.append("password", password);
+        
+                fetch("http://195.35.2.184:8000/upload", {
+                    method: "POST",
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data);
+                    if (data.message === "success") {
+                        console.log("Upload réussi.");
+                        window.location.href = 'profile.html';
+                    } else {
+                        alert("Échec de l'upload.");
+                    }
+                })
+                .catch(error => {
+                    console.error('Erreur lors de l\'upload:', error);
+                    alert("Une erreur est survenue !");
+                });
+            });
+        </script>
+        
+    </body>
+</html>
